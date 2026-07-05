@@ -165,7 +165,7 @@ def construir_frames(cierres: pd.DataFrame, sectores: dict, cfg: dict, overlays:
 
 
 # -------------------------------------------------------------------- replay
-def replay(cfg: dict, F: dict, estado: dict = None, bloqueados=None) -> dict:
+def replay(cfg: dict, F: dict, estado: dict = None, bloqueados=None, forzar_solo_cripto=False) -> dict:
     """Fase barata: simula la cartera. Réplica línea a línea de _btReplay (Codigo.gs).
 
     `estado` (opcional, modo VIVO): {"liquido": float, "pos": {tk: {u, pm, pmax}}}.
@@ -207,6 +207,8 @@ def replay(cfg: dict, F: dict, estado: dict = None, bloqueados=None) -> dict:
         for tk in list(pos.keys()):
             j = idx[tk]
             if np.isnan(sc[j]):
+                continue
+            if forzar_solo_cripto and sec[j] != "Cripto":     # fin de semana: no se tocan acciones (mercado cerrado)
                 continue
             p = pos[tk]
             d_px, d_atr, d_sc = float(px[j]), float(at[j]) if not np.isnan(at[j]) else 0.0, float(sc[j])
@@ -251,7 +253,7 @@ def replay(cfg: dict, F: dict, estado: dict = None, bloqueados=None) -> dict:
 
         # --- entradas ---
         libres = cfg["MAX_POSICIONES"] - len(pos)
-        solo_cripto = (not risk_on) and (not en_dd)
+        solo_cripto = forzar_solo_cripto or ((not risk_on) and (not en_dd))
         if libres > 0 and not en_dd:
             por_sec = {}
             for t in pos:

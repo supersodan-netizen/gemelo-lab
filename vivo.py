@@ -113,6 +113,9 @@ def ciclo(anos_datos: int = 2, aportar: float = 0.0, reset: bool = False, public
     F0 = frames_por_motor["puro"]
     fecha_dato = str(F0["fechas"][-1])[:10]
     hoy = datetime.strptime(fecha_dato, "%Y-%m-%d")
+    es_finde = datetime.now().weekday() >= 5          # sáb(5)/dom(6): mercado de acciones cerrado -> solo cripto
+    if es_finde:
+        print("Fin de semana: mercado de acciones cerrado; solo se opera cripto (como en el Gemelo).")
 
     resumen_web = {}
     registros_por_motor = {}
@@ -131,7 +134,7 @@ def ciclo(anos_datos: int = 2, aportar: float = 0.0, reset: bool = False, public
 
         pnl_antes = {tk: p for tk, p in ec["pos"].items()}
         r = replay(PARAMS, ultimo, estado={"liquido": ec["liquido"], "pos": ec["pos"]},
-                   bloqueados=bloqueados)
+                   bloqueados=bloqueados, forzar_solo_cripto=es_finde)
         for op in r["registro"]:
             if op["accion"] == "VENTA":
                 pm = pnl_antes[op["tk"]]["pm"]

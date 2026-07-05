@@ -118,6 +118,7 @@ def correr_todos():
     test_replay_con_estado_persistente()
     test_cooldown_bloquea_recompra()
     test_ejecutor_puertas_de_seguridad()
+    test_finde_solo_cripto()
     print("\nTODOS LOS TESTS PASAN ✅\n")
 
 
@@ -185,3 +186,15 @@ def test_ejecutor_puertas_de_seguridad():
         if os.path.exists(ej.RUTA_KILL):
             os.remove(ej.RUTA_KILL)
     print("✓ ejecutor: bloqueado por defecto, kill switch y techos operativos, puerto real vetado")
+
+
+def test_finde_solo_cripto():
+    """En fin de semana no se compran acciones (mercado cerrado); solo cripto."""
+    precios = [100, 100, 100]
+    F = _frames_a_mano(precios)                            # ticker 'A' sector Tec, score 99
+    c = _cfg()
+    normal = replay(c, F, estado={"liquido": 1000.0, "pos": {}}, forzar_solo_cripto=False)
+    finde = replay(c, F, estado={"liquido": 1000.0, "pos": {}}, forzar_solo_cripto=True)
+    assert normal["registro"] and normal["registro"][0]["accion"] == "COMPRA"   # día normal: compra
+    assert not finde["registro"] and not finde["pos"]                            # finde: no compra acción
+    print("✓ fin de semana: no compra acciones (solo cripto), como el Gemelo")
