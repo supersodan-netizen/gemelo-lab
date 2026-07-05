@@ -1,0 +1,46 @@
+name: bot-diario
+
+# El bot corre SOLO en los servidores de GitHub: sin PC, sin servidor, sin coste.
+# CADA HORA durante las horas de mercado (Europa 09:00 CET -> cierre USA 22:00 CET),
+# lunes a viernes: mismo contexto diario completo que el Gemelo de la hoja
+# (decisión horaria + máximos del trailing frescos), gratis en repos públicos.
+on:
+  schedule:
+    - cron: "30 8-21 * * 1-5"
+  workflow_dispatch: {}        # botón "Run workflow": puedes lanzarlo a mano (también desde la app móvil de GitHub)
+
+permissions:
+  contents: write              # necesario para que el bot commitee su estado
+
+concurrency:
+  group: bot                   # nunca dos bots a la vez (la misma protección que el lock del Gemelo)
+  cancel-in-progress: false
+
+jobs:
+  paso-del-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Paso del bot (dos motores en paralelo; exporta a la web)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # opcional: sin clave, el motor COMPLETO va sin sentimiento IA
+        run: python main.py vivo
+
+      - name: Publicar estado (la web se actualiza sola)
+        run: |
+          git config user.name  "gemelo-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add estado_vivo.json docs/estado.json fundamentales.json sentimiento.json 2>/dev/null || git add estado_vivo.json docs/estado.json
+          git diff --cached --quiet && echo "Sin cambios que publicar" && exit 0
+          git commit -m "bot: paso $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gemelo · Sala de control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --fondo:#101418; --panel:#171D23; --panel2:#1C242C; --linea:#2A333C;
+    --tinta:#E8EDF2; --tenue:#8FA0AE; --debil:#5C6B78;
+    --verde:#3DDC97; --ambar:#F5B84A; --rojo:#FF6B6B; --cian:#55C1E8;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --sans:"IBM Plex Sans",system-ui,sans-serif;
+    --disp:"Saira Condensed",var(--sans);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--fondo);color:var(--tinta);font-family:var(--sans);font-size:14px;min-height:100vh}
+  a{color:var(--cian)}
+
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(var(--fondo) 75%,transparent);padding:14px 20px 10px}
+  .barra{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--linea);padding-bottom:10px}
+  .logo{font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:.06em;text-transform:uppercase}
+  .logo b{color:var(--cian);font-weight:700}
+  .led{display:inline-flex;align-items:center;gap:7px;color:var(--tenue);font-size:12.5px}
+  .led i{width:9px;height:9px;border-radius:50%;background:var(--debil);display:inline-block}
+  .led.ok i{background:var(--verde);animation:puls 2.2s ease-in-out infinite}
+  .led.viejo i{background:var(--ambar)} .led.error i{background:var(--rojo)}
+  @keyframes puls{0%,100%{box-shadow:0 0 0 0 rgba(61,220,151,.5)}50%{box-shadow:0 0 0 6px rgba(61,220,151,0)}}
+  @media (prefers-reduced-motion:reduce){.led.ok i{animation:none}}
+  .barra .accion{margin-left:auto;display:flex;gap:8px}
+  button{background:var(--panel2);color:var(--tinta);border:1px solid var(--linea);border-radius:6px;
+         padding:6px 12px;font-family:var(--sans);font-size:12.5px;cursor:pointer}
+  button:hover{border-color:var(--cian)} button:focus-visible{outline:2px solid var(--cian);outline-offset:2px}
+
+  main{max-width:1180px;margin:0 auto;padding:10px 20px 60px}
+
+  /* fila de instrumentos */
+  .instrumentos{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:14px 0 18px}
+  .inst{background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:14px 16px}
+  .inst .rotulo{font-family:var(--disp);font-weight:500;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--tenue)}
+  .inst .valor{font-family:var(--mono);font-weight:600;font-size:26px;margin-top:4px}
+  .inst .sub{color:var(--tenue);font-size:12px;margin-top:2px;font-family:var(--mono)}
+  .pos{color:var(--verde)} .neg{color:var(--rojo)} .neutro{color:var(--tinta)}
+
+  .panelG{background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:16px;margin-bottom:14px}
+  .panelG h2{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.12em;text-transform:uppercase;
+             color:var(--tenue);margin-bottom:12px;display:flex;gap:8px;align-items:center}
+  .panelG h2::before{content:"";width:8px;height:8px;background:var(--cian);display:inline-block}
+
+  .malla{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.8px}
+  th{font-family:var(--disp);font-weight:500;letter-spacing:.1em;text-transform:uppercase;font-size:11.5px;
+     color:var(--debil);text-align:right;padding:4px 8px;border-bottom:1px solid var(--linea)}
+  th:first-child,td:first-child{text-align:left}
+  td{padding:6px 8px;text-align:right;border-bottom:1px solid rgba(42,51,60,.5);white-space:nowrap}
+  .chip{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-family:var(--disp);
+        letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--linea)}
+  .selmotor{display:inline-flex;gap:0;margin-left:10px;vertical-align:middle;border:1px solid var(--linea);border-radius:6px;overflow:hidden}
+  .selmotor button{border:0;border-radius:0;padding:4px 12px;font-family:var(--disp);letter-spacing:.08em;font-size:11.5px;background:var(--panel2);color:var(--tenue)}
+  .selmotor button.act{background:var(--cian);color:#0b1116;font-weight:700}
+  .chip.prop{color:var(--ambar);border-color:var(--ambar)} .chip.ejec{color:var(--verde);border-color:var(--verde)}
+  .chip.rech{color:var(--debil)} .chip.compra{color:var(--cian);border-color:var(--cian)} .chip.venta{color:var(--tenue)}
+
+  /* aviso de acción pendiente */
+  .alerta{display:none;background:rgba(245,184,74,.08);border:1px solid var(--ambar);border-radius:10px;
+          padding:12px 16px;margin-bottom:14px;color:var(--ambar);font-weight:500}
+
+  /* banda de vuelo del test en vivo */
+  .banda{position:relative;height:64px;margin:18px 6px 6px}
+  .banda .pista{position:absolute;top:28px;left:0;right:0;height:10px;border-radius:5px;
+    background:linear-gradient(90deg,var(--rojo) 0%,var(--ambar) 18%,var(--verde) 40%,var(--verde) 60%,var(--cian) 85%)}
+  .banda .marca{position:absolute;top:18px;width:2px;height:30px;background:var(--tenue)}
+  .banda .marca span{position:absolute;top:32px;left:50%;transform:translateX(-50%);font-family:var(--mono);
+    font-size:10.5px;color:var(--debil);white-space:nowrap}
+  .banda .aguja{position:absolute;top:6px;transform:translateX(-50%);transition:left .8s ease}
+  .banda .aguja::after{content:"";display:block;width:0;height:0;margin:2px auto 0;
+    border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--tinta)}
+  .banda .aguja b{font-family:var(--mono);font-size:12px;background:var(--panel2);border:1px solid var(--linea);
+    padding:1px 6px;border-radius:4px}
+  .estado-seg{font-family:var(--mono);font-size:13px;margin-top:26px}
+
+  svg.spark{width:100%;height:88px;display:block}
+
+  .sector-chips{display:flex;flex-wrap:wrap;gap:6px}
+  .sector-chips .chip{color:var(--tenue)}
+  .sector-chips .chip:nth-child(-n+4){color:var(--verde);border-color:rgba(61,220,151,.5)}
+
+  footer{color:var(--debil);font-size:12px;text-align:center;padding:18px;line-height:1.6}
+
+  /* configuración */
+  #config{max-width:640px;margin:60px auto;background:var(--panel);border:1px solid var(--linea);border-radius:12px;padding:28px}
+  #config h1{font-family:var(--disp);font-size:24px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+  #config p{color:var(--tenue);margin:10px 0;line-height:1.55}
+  #config input{width:100%;background:var(--fondo);border:1px solid var(--linea);border-radius:6px;color:var(--tinta);
+    padding:10px 12px;font-family:var(--mono);font-size:13px;margin:10px 0}
+  #config ol{margin:10px 0 10px 20px;color:var(--tenue);line-height:1.7}
+  .oculto{display:none!important}
+  #cargando{color:var(--tenue);text-align:center;padding:40px;font-family:var(--mono)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="barra">
+    <div class="logo">Gemelo <b>·</b> Sala de control</div>
+    <span class="led" id="led"><i></i><span id="led-txt">sin conexión</span></span>
+    <div class="accion">
+      <button id="btn-refrescar" type="button">Actualizar vista</button>
+      <button id="btn-config" type="button" title="Cambiar URL de la API">⚙</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="config" class="oculto">
+    <h1>Conectar con tu Gemelo</h1>
+    <p>Este panel lee (solo lectura) la API de tu hoja de cálculo. Para obtener la URL:</p>
+    <ol>
+      <li>En el editor de Apps Script: <b>Implementar → Nueva implementación → Aplicación web</b>.</li>
+      <li>Ejecutar como: <b>tú</b> · Acceso: <b>Cualquier usuario</b>.</li>
+      <li>Copia la URL que termina en <b>/exec</b> y pégala aquí.</li>
+    </ol>
+    <input id="input-url" type="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off">
+    <button id="btn-guardar" type="button">Guardar y conectar</button>
+    <p style="font-size:12px">La URL se guarda solo en este navegador (localStorage). No se sube a ningún sitio.</p>
+  </section>
+
+  <div id="cargando" class="oculto">Leyendo telemetría del Gemelo…</div>
+
+  <section id="tablero" class="oculto">
+    <div class="alerta" id="alerta"></div>
+
+    <div class="instrumentos">
+      <div class="inst"><div class="rotulo">Patrimonio</div><div class="valor" id="i-patrimonio">—</div><div class="sub" id="i-liquido">—</div></div>
+      <div class="inst"><div class="rotulo">P&amp;L realizado</div><div class="valor" id="i-pnl">—</div><div class="sub" id="i-rent">—</div></div>
+      <div class="inst"><div class="rotulo">Posiciones</div><div class="valor" id="i-npos">—</div><div class="sub" id="i-valorpos">—</div></div>
+      <div class="inst"><div class="rotulo">Dato de mercado</div><div class="valor" id="i-frescura" style="font-size:20px">—</div><div class="sub">precios cada ~10 min</div></div>
+    </div>
+
+    <div class="panelG">
+      <h2>Test en vivo · motor vs modelo</h2>
+      <div id="seg-vacio" class="oculto" style="color:var(--tenue)">Aún sin iniciar: usa el menú <b>🎯 Iniciar test en vivo</b> en la hoja.</div>
+      <div id="seg-cont">
+        <div class="banda">
+          <div class="pista"></div>
+          <div class="marca" style="left:12%"><span id="b-inf">—</span></div>
+          <div class="marca" style="left:50%"><span id="b-esp">—</span></div>
+          <div class="marca" style="left:88%"><span id="b-sup">—</span></div>
+          <div class="aguja" id="aguja" style="left:50%"><b id="b-eq">—</b></div>
+        </div>
+        <div class="estado-seg" id="seg-estado">—</div>
+      </div>
+    </div>
+
+    <div class="panelG">
+      <h2>Curva de patrimonio</h2>
+      <svg class="spark" id="spark" viewBox="0 0 600 88" preserveAspectRatio="none" aria-label="curva de patrimonio"></svg>
+    </div>
+
+    <div class="malla">
+      <div class="panelG">
+        <h2>Posiciones abiertas</h2>
+        <table><thead><tr><th>Valor</th><th>Uds</th><th>Compra</th><th>Actual</th><th>Valor €</th><th>P&amp;L</th></tr></thead>
+        <tbody id="t-pos"></tbody></table>
+      </div>
+
+      <div class="panelG">
+        <h2>Últimas operaciones</h2>
+        <table><thead><tr><th>Fecha</th><th>Valor</th><th></th><th>€</th><th>Estado</th></tr></thead>
+        <tbody id="t-ops"></tbody></table>
+      </div>
+
+      <div class="panelG">
+        <h2>Radar de mercado · mejores scores</h2>
+        <table><thead><tr><th>Valor</th><th>Sector</th><th>Precio</th><th>Score</th></tr></thead>
+        <tbody id="t-radar"></tbody></table>
+      </div>
+
+      <div class="panelG">
+        <h2>Sectores en cabeza</h2>
+        <div class="sector-chips" id="sectores"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Telemetría del Gemelo Digital · precios cada ~10 min, indicadores diarios · esta vista se re-lee cada 60 s.<br>
+  Panel de solo lectura: las aprobaciones se hacen en la hoja. Dinero ficticio · no es asesoramiento financiero.
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var CLAVE="gemelo_api_url";
+  var eur=new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR"});
+  var num=function(x){var v=parseFloat(String(x).replace(",","."));return isNaN(v)?0:v;};
+  var $=function(id){return document.getElementById(id);};
+
+  function muestra(id){["config","cargando","tablero"].forEach(function(s){$(s).classList.add("oculto");});$(id).classList.remove("oculto");}
+
+  // ---- carga: 1º estado.json del bot Python (mismo repo); 2º API del Apps Script (JSONP) ----
+  var timeoutJsonp=null;
+  window.__gemelo=function(data){clearTimeout(timeoutJsonp);try{render(data);}catch(e){falla("Respuesta inesperada de la API");console.error(e);}};
+  function cargar(){
+    fetch("estado.json?_="+Date.now(),{cache:"no-store"})
+      .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(d){ render(d); })
+      .catch(function(){ cargarAppsScript(); });
+  }
+  function cargarAppsScript(){
+    var url=localStorage.getItem(CLAVE);
+    if(!url){muestra("config");return;}
+    muestra("cargando");
+    var s=document.createElement("script");
+    s.src=url+(url.indexOf("?")>=0?"&":"?")+"callback=__gemelo&_="+Date.now();
+    s.onerror=function(){falla("No se pudo contactar con la API (revisa la URL y la implementación)");};
+    timeoutJsonp=setTimeout(function(){falla("La API no responde (¿implementada como 'Cualquier usuario'?)");},20000);
+    document.body.appendChild(s);
+  }
+  function falla(msg){
+    muestra("tablero");
+    var led=$("led");led.className="led error";$("led-txt").textContent=msg;
+  }
+
+  // ---- render ----
+  var carteraSel = localStorage.getItem("gemelo_cartera") || "puro";
+  function render(dOrig){
+    window.__ultimo = dOrig;
+    var d = dOrig;
+    var selectorHTML = "";
+    if (dOrig.carteras){
+      d = Object.assign({}, dOrig.carteras[carteraSel] || dOrig.carteras.puro, {fuente: dOrig.fuente});
+      selectorHTML = "<span class='selmotor'>" +
+        "<button type='button' data-c='puro' class='"+(carteraSel==="puro"?"act":"")+"' title='Motor validado: solo factores de precio'>PURO</button>" +
+        "<button type='button' data-c='completo' class='"+(carteraSel==="completo"?"act":"")+"' title='Precio + analistas + fundamentales + sentimiento IA'>COMPLETO</button></span>";
+    }
+    muestra("tablero");
+    document.querySelector(".logo").innerHTML = "Gemelo <b>·</b> Sala de control " +
+      (dOrig.fuente==="bot-python"
+        ? "<span class='chip ejec' style='vertical-align:middle;margin-left:6px'>BOT PYTHON</span>" + selectorHTML
+        : "<span class='chip' style='vertical-align:middle;margin-left:6px;color:var(--cian);border-color:var(--cian)'>HOJA</span>");
+    document.querySelectorAll(".selmotor button").forEach(function(b){
+      b.addEventListener("click", function(){
+        carteraSel = b.getAttribute("data-c");
+        localStorage.setItem("gemelo_cartera", carteraSel);
+        render(window.__ultimo);
+      });
+    });
+    var liq=d.liquidez||{};
+    var pos=(d.posiciones||[]).slice(1).filter(function(r){return String(r[0]||"").trim();});
+    var valorPos=0;pos.forEach(function(r){valorPos+=num(r[5]);});
+    var patrimonio=num(liq.liquido)+valorPos;
+
+    $("i-patrimonio").textContent=eur.format(patrimonio);
+    $("i-liquido").textContent="líquido "+eur.format(num(liq.liquido))+" · aportado "+eur.format(num(liq.aportado));
+    var pnl=num(liq.pnlAcum);
+    var elPnl=$("i-pnl");elPnl.textContent=(pnl>=0?"+":"")+eur.format(pnl);elPnl.className="valor "+(pnl>=0?"pos":"neg");
+    var rent=num(liq.aportado)?pnl/num(liq.aportado)*100:0;
+    $("i-rent").textContent="rentabilidad realizada "+(rent>=0?"+":"")+rent.toFixed(1)+"%";
+    $("i-npos").textContent=pos.length;
+    $("i-valorpos").textContent="en mercado "+eur.format(valorPos);
+
+    // frescura (LED)
+    var f=(d.frescura&&d.frescura.precios)||0;
+    var min=f?Math.round((Date.now()-f)/60000):null;
+    var led=$("led");
+    if(min===null){led.className="led";$("led-txt").textContent="sin dato de frescura";$("i-frescura").textContent="—";}
+    else{
+      $("i-frescura").textContent="hace "+(min<60?min+" min":(min/60).toFixed(1)+" h");
+      if(min<=15){led.className="led ok";$("led-txt").textContent="datos al día · hace "+min+" min";}
+      else if(min<=120){led.className="led viejo";$("led-txt").textContent="datos de hace "+min+" min";}
+      else{led.className="led error";$("led-txt").textContent="datos viejos ("+(min/60).toFixed(1)+" h) · revisa la automatización";}
+    }
+
+    // acción pendiente
+    var ops=(d.operaciones||[]).slice(1);
+    var pendientes=ops.filter(function(r){return String(r[11]).toUpperCase()==="PROPUESTA";});
+    var al=$("alerta");
+    if(pendientes.length){al.style.display="block";al.textContent="⚠ "+pendientes.length+" propuesta"+(pendientes.length>1?"s":"")+" esperando tu aprobación — ábrela en la hoja (pestaña Operaciones).";}
+    else al.style.display="none";
+
+    // posiciones
+    $("t-pos").innerHTML=pos.map(function(r){
+      var p=num(r[7]),pp=num(r[8]);var cls=p>=0?"pos":"neg";
+      return "<tr><td>"+r[0]+"</td><td>"+num(r[2]).toLocaleString("es-ES",{maximumFractionDigits:4})+"</td>"+
+        "<td>"+num(r[3]).toFixed(2)+"</td><td>"+num(r[4]).toFixed(2)+"</td><td>"+eur.format(num(r[5]))+"</td>"+
+        "<td class='"+cls+"'>"+(p>=0?"+":"")+p.toFixed(2)+" ("+(pp>=0?"+":"")+pp.toFixed(1)+"%)</td></tr>";
+    }).join("")||"<tr><td colspan='6' style='color:var(--tenue)'>Sin posiciones abiertas</td></tr>";
+
+    // operaciones (últimas 12, más recientes arriba)
+    $("t-ops").innerHTML=ops.slice(-12).reverse().map(function(r){
+      var est=String(r[11]).toUpperCase();
+      var chip=est==="PROPUESTA"?"prop":est==="EJECUTADA"?"ejec":"rech";
+      var acc=String(r[3]).toUpperCase()==="COMPRA"?"compra":"venta";
+      var fecha=String(r[0]).slice(0,10);
+      return "<tr><td>"+fecha+"</td><td>"+r[1]+"</td><td><span class='chip "+acc+"'>"+r[3]+"</span></td>"+
+        "<td>"+eur.format(num(r[6]))+"</td><td><span class='chip "+chip+"'>"+est+"</span></td></tr>";
+    }).join("")||"<tr><td colspan='5' style='color:var(--tenue)'>Aún sin operaciones</td></tr>";
+
+    // radar: top scores (col 14 = score), sin filas ERROR
+    var datos=(d.datos||[]).slice(1).filter(function(r){return r[3]!=="ERROR"&&num(r[13])>0;});
+    datos.sort(function(a,b){return num(b[13])-num(a[13]);});
+    $("t-radar").innerHTML=datos.slice(0,10).map(function(r){
+      return "<tr><td>"+r[0]+"</td><td style='color:var(--tenue)'>"+r[2]+"</td><td>"+num(r[3]).toFixed(2)+"</td>"+
+        "<td class='"+(num(r[13])>=60?"pos":"neutro")+"'>"+Math.round(num(r[13]))+"</td></tr>";
+    }).join("");
+
+    // sectores fuertes
+    var fs=d.fuerzaSectores||[];
+    $("sectores").innerHTML=fs.slice(0,13).map(function(x){
+      var nombre=(x&&typeof x==="object")?(x.s||x.sector||JSON.stringify(x)):String(x);
+      return "<span class='chip'>"+nombre+"</span>";
+    }).join("")||"<span style='color:var(--tenue)'>Se rellena tras ① Actualizar datos</span>";
+
+    // curva (histórico: col 4 = patrimonio gemelo)
+    var h=(d.historico||[]).slice(1).map(function(r){return num(r[3]);}).filter(function(v){return v>0;});
+    dibujaSpark(h);
+
+    // banda de vuelo (seguimiento: última fila)
+    var seg=(d.seguimiento||[]).filter(function(r){return r&&String(r[0]||"").trim()&&!isNaN(num(r[2]));});
+    if(!seg.length){$("seg-vacio").classList.remove("oculto");$("seg-cont").classList.add("oculto");}
+    else{
+      $("seg-vacio").classList.add("oculto");$("seg-cont").classList.remove("oculto");
+      var u=seg[seg.length-1];
+      var eq=num(u[2]),esp=num(u[3]),inf=num(u[4]),sup=num(u[5]);
+      $("b-inf").textContent="−1σ "+eur.format(inf);
+      $("b-esp").textContent="esperado "+eur.format(esp);
+      $("b-sup").textContent="+1σ "+eur.format(sup);
+      $("b-eq").textContent=eur.format(eq);
+      // 12% ↔ inf · 50% ↔ esperado · 88% ↔ sup (escala por tramos)
+      var p;
+      if(eq<=esp) p=sup>inf?12+38*Math.max(0,(eq-inf))/Math.max(1e-9,(esp-inf)):50;
+      else p=50+38*Math.min(1,(eq-esp)/Math.max(1e-9,(sup-esp)));
+      p=Math.max(3,Math.min(97,p));
+      $("aguja").style.left=p+"%";
+      $("seg-estado").textContent="Semana "+u[1]+" · "+u[9]+" · desviación "+(num(u[6])>=0?"+":"")+num(u[6]).toFixed(1)+"% · índice mismo periodo "+(u[7]==="—"?"—":eur.format(num(u[7])));
+    }
+  }
+
+  function dibujaSpark(v){
+    var svg=$("spark");
+    if(!v||v.length<2){svg.innerHTML="<text x='10' y='48' fill='#5C6B78' font-size='12'>La curva aparece con los snapshots diarios</text>";return;}
+    var min=Math.min.apply(null,v),max=Math.max.apply(null,v),rng=(max-min)||1;
+    var pts=v.map(function(y,i){return [(i/(v.length-1))*600,80-((y-min)/rng)*72+4];});
+    var linea=pts.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join(" ");
+    var area=linea+" 600,88 0,88";
+    svg.innerHTML="<polygon points='"+area+"' fill='rgba(85,193,232,.12)'/>"+
+      "<polyline points='"+linea+"' fill='none' stroke='#55C1E8' stroke-width='2'/>";
+  }
+
+  // ---- eventos ----
+  $("btn-guardar").addEventListener("click",function(){
+    var u=$("input-url").value.trim();
+    if(!/^https:\/\/script\.google\.com\/.+\/exec/.test(u)){alert("Pega la URL completa de la implementación (termina en /exec).");return;}
+    localStorage.setItem(CLAVE,u);cargar();
+  });
+  $("btn-config").addEventListener("click",function(){
+    $("input-url").value=localStorage.getItem(CLAVE)||"";muestra("config");
+  });
+  $("btn-refrescar").addEventListener("click",cargar);
+
+  cargar();
+  setInterval(cargar,60000);   // el dato de fondo cambia cada ~10 min; la vista se relee cada 60 s
+})();
+</script>
+</body>
+</html>

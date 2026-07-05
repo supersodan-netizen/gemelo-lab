@@ -1,0 +1,7 @@
+# datos locales (no subir al repo: pesados y personales)
+cache_datos/
+*.csv
+# python
+__pycache__/
+*.pyc
+.venv/
