@@ -52,7 +52,7 @@ UNIVERSO = [
     ('PFE', 'Pfizer', 'Salud'),
     ('MRK', 'Merck', 'Salud'),
     ('NOVN.SW', 'Novartis', 'Salud'),
-    ('RO.SW', 'Roche', 'Salud'),
+    ('ROG.SW', 'Roche', 'Salud'),
     ('ABBV', 'AbbVie', 'Salud'),
     ('AZN.L', 'AstraZeneca', 'Salud'),
     ('SAN.PA', 'Sanofi', 'Salud'),

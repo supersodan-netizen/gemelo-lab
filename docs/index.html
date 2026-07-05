@@ -19,7 +19,7 @@
   body{background:var(--fondo);color:var(--tinta);font-family:var(--sans);font-size:14px;min-height:100vh}
   a{color:var(--cian)}
 
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(var(--fondo) 75%,transparent);padding:14px 20px 10px}
+  header{position:relative;background:var(--fondo);padding:14px 20px 10px}
   .barra{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--linea);padding-bottom:10px}
   .logo{font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:.06em;text-transform:uppercase}
   .logo b{color:var(--cian);font-weight:700}
@@ -38,6 +38,7 @@
 
   /* fila de instrumentos */
   .instrumentos{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:14px 0 18px}
+  .inst{min-width:0;}
   .inst{background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:14px 16px}
   .inst .rotulo{font-family:var(--disp);font-weight:500;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--tenue)}
   .inst .valor{font-family:var(--mono);font-weight:600;font-size:26px;margin-top:4px}
@@ -50,6 +51,8 @@
   .panelG h2::before{content:"";width:8px;height:8px;background:var(--cian);display:inline-block}
 
   .malla{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+  .malla .panelG{min-width:0;overflow:hidden;}
+  .panelG table{display:block;overflow-x:auto;white-space:nowrap;}
   table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.8px}
   th{font-family:var(--disp);font-weight:500;letter-spacing:.1em;text-transform:uppercase;font-size:11.5px;
      color:var(--debil);text-align:right;padding:4px 8px;border-bottom:1px solid var(--linea)}
@@ -202,22 +205,22 @@
   function muestra(id){["config","cargando","tablero"].forEach(function(s){$(s).classList.add("oculto");});$(id).classList.remove("oculto");}
 
   // ---- carga: 1º estado.json del bot Python (mismo repo); 2º API del Apps Script (JSONP) ----
-  var timeoutJsonp=null;
-  window.__gemelo=function(data){clearTimeout(timeoutJsonp);try{render(data);}catch(e){falla("Respuesta inesperada de la API");console.error(e);}};
+  var timeoutJsonp=null, primeraCarga=true;
+  window.__gemelo=function(data){clearTimeout(timeoutJsonp);try{render(data);primeraCarga=false;}catch(e){falla("Respuesta inesperada de la API");console.error(e);}};
   function cargar(){
     fetch("estado.json?_="+Date.now(),{cache:"no-store"})
       .then(function(r){ if(!r.ok) throw 0; return r.json(); })
-      .then(function(d){ render(d); })
+      .then(function(d){ render(d); primeraCarga=false; })
       .catch(function(){ cargarAppsScript(); });
   }
   function cargarAppsScript(){
     var url=localStorage.getItem(CLAVE);
     if(!url){muestra("config");return;}
-    muestra("cargando");
+    if(primeraCarga) muestra("cargando");        // solo parpadea la 1ª vez; los refrescos son en segundo plano
     var s=document.createElement("script");
     s.src=url+(url.indexOf("?")>=0?"&":"?")+"callback=__gemelo&_="+Date.now();
-    s.onerror=function(){falla("No se pudo contactar con la API (revisa la URL y la implementación)");};
-    timeoutJsonp=setTimeout(function(){falla("La API no responde (¿implementada como 'Cualquier usuario'?)");},20000);
+    s.onerror=function(){ if(primeraCarga) falla("No se pudo contactar con la API (revisa la URL y la implementación)"); };
+    timeoutJsonp=setTimeout(function(){ if(primeraCarga) falla("La API no responde (¿implementada como 'Cualquier usuario'?)"); },20000);
     document.body.appendChild(s);
   }
   function falla(msg){
@@ -263,14 +266,20 @@
     $("i-npos").textContent=pos.length;
     $("i-valorpos").textContent="en mercado "+eur.format(valorPos);
 
-    // frescura (LED)
+    // frescura (LED). El bot marca frescura.precios; si no, usa fecha_dato como respaldo.
     var f=(d.frescura&&d.frescura.precios)||0;
     var min=f?Math.round((Date.now()-f)/60000):null;
     var led=$("led");
-    if(min===null){led.className="led";$("led-txt").textContent="sin dato de frescura";$("i-frescura").textContent="—";}
+    if(min===null){
+      led.className="led ok";
+      var fd = d.fecha_dato || (d.actualizado||"").slice(0,10);
+      $("led-txt").textContent = fd ? ("dato del "+fd) : "conectado";
+      $("i-frescura").textContent = fd ? fd : "al día";
+      $("i-frescura").style.fontSize = "15px";
+    }
     else{
       $("i-frescura").textContent="hace "+(min<60?min+" min":(min/60).toFixed(1)+" h");
-      if(min<=15){led.className="led ok";$("led-txt").textContent="datos al día · hace "+min+" min";}
+      if(min<=20){led.className="led ok";$("led-txt").textContent="datos al día · hace "+min+" min";}
       else if(min<=120){led.className="led viejo";$("led-txt").textContent="datos de hace "+min+" min";}
       else{led.className="led error";$("led-txt").textContent="datos viejos ("+(min/60).toFixed(1)+" h) · revisa la automatización";}
     }

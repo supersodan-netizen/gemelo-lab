@@ -163,8 +163,8 @@ def experimento_volumen(cfg, cierres, sectores, volumenes, peso_volumen=15.0,
                      f"(justo lo previsto). No compensa la complejidad extra.")
     return comp, veredicto, {"cagr": mejora_cagr, "sharpe": mejora_sharpe, "peso": peso_volumen}
 
+
 def imprimir_montecarlo(mc: dict):
-    
     print(f"\n===== MONTE CARLO · {mc['meses']} meses · {mc['caminos']} caminos =====")
     print(f"Resultado a {mc['meses']} meses (percentiles):")
     print(f"  P5 {mc['p5']:+.1f}%   P25 {mc['p25']:+.1f}%   MEDIANA {mc['p50']:+.1f}%   "
