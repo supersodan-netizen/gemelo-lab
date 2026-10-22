@@ -3,24 +3,14 @@
  "carteras": {
   "puro": {
    "inicio": "2026-07-05 17:54",
-   "liquido": 115.30675297716974,
+   "liquido": 112.26584292727506,
    "aportado": 2000.0,
-   "pnlAcum": -557.9199235723871,
+   "pnlAcum": -590.0127068191941,
    "pos": {
-    "REP.MC": {
-     "u": 8.0,
-     "pm": 30.1200008392334,
-     "pmax": 30.1200008392334
-    },
     "EQNR": {
      "u": 6.0,
      "pm": 45.51499938964844,
      "pmax": 46.97999954223633
-    },
-    "ADA-EUR": {
-     "u": 866.411845,
-     "pm": 0.20423999428749084,
-     "pmax": 0.2056400030851364
     },
     "TMO": {
      "u": 0.312464,
@@ -30,60 +20,29 @@
     "SAP.DE": {
      "u": 0.735039,
      "pm": 198.10000610351562,
-     "pmax": 214.3000030517578
+     "pmax": 215.35000610351562
     },
     "CRM": {
      "u": 1.0,
      "pm": 240.6999969482422,
-     "pmax": 246.2100067138672
+     "pmax": 250.0449981689453
+    },
+    "COP": {
+     "u": 1.0,
+     "pm": 146.05999755859375,
+     "pmax": 146.05999755859375
+    },
+    "PFE": {
+     "u": 8.0,
+     "pm": 30.22260093688965,
+     "pmax": 30.22260093688965
     }
    },
-   "cooldown": {},
+   "cooldown": {
+    "REP.MC": "2026-10-22",
+    "ADA-EUR": "2026-10-22"
+   },
    "operaciones": [
-    {
-     "t": "2026-07-07",
-     "tk": "GE",
-     "accion": "VENTA",
-     "u": 0.90623,
-     "px": 365.2821044921875,
-     "pnl_pct": -3.24,
-     "motivo": "Trailing stop",
-     "nombre": "GE Aerospace",
-     "alg": "5.0"
-    },
-    {
-     "t": "2026-07-07",
-     "tk": "LLY",
-     "accion": "COMPRA",
-     "u": 0.378542,
-     "px": 1235.7049560546875,
-     "pnl_pct": 0.0,
-     "motivo": "Score 89",
-     "nombre": "Eli Lilly",
-     "alg": "5.0"
-    },
-    {
-     "t": "2026-07-08",
-     "tk": "UCG.MI",
-     "accion": "VENTA",
-     "u": 4.0,
-     "px": 79.37000274658203,
-     "pnl_pct": -3.07,
-     "motivo": "Trailing stop",
-     "nombre": "UniCredit",
-     "alg": "5.0"
-    },
-    {
-     "t": "2026-07-08",
-     "tk": "SAN.MC",
-     "accion": "VENTA",
-     "u": 32.0,
-     "px": 11.814000129699707,
-     "pnl_pct": -4.12,
-     "motivo": "Trailing stop",
-     "nombre": "Santander",
-     "alg": "5.0"
-    },
     {
      "t": "2026-07-08",
      "tk": "ANET",
@@ -1359,6 +1318,50 @@
      "motivo": "Score 85",
      "nombre": "Salesforce",
      "alg": "5.0"
+    },
+    {
+     "t": "2026-10-22",
+     "tk": "REP.MC",
+     "accion": "VENTA",
+     "u": 8.0,
+     "px": 28.260000228881836,
+     "pnl_pct": -6.18,
+     "motivo": "Trailing stop",
+     "nombre": "Repsol",
+     "alg": "5.0"
+    },
+    {
+     "t": "2026-10-22",
+     "tk": "ADA-EUR",
+     "accion": "VENTA",
+     "u": 866.411845,
+     "px": 0.18898999691009521,
+     "pnl_pct": -7.47,
+     "motivo": "Trailing stop",
+     "nombre": "Cardano",
+     "alg": "5.0"
+    },
+    {
+     "t": "2026-10-22",
+     "tk": "COP",
+     "accion": "COMPRA",
+     "u": 1.0,
+     "px": 146.05999755859375,
+     "pnl_pct": 0.0,
+     "motivo": "Score 89",
+     "nombre": "ConocoPhillips",
+     "alg": "5.0"
+    },
+    {
+     "t": "2026-10-22",
+     "tk": "PFE",
+     "accion": "COMPRA",
+     "u": 8.0,
+     "px": 30.22260093688965,
+     "pnl_pct": 0.0,
+     "motivo": "Score 86",
+     "nombre": "Pfizer",
+     "alg": "5.0"
     }
    ],
    "historico": [
@@ -1826,32 +1829,22 @@
     ],
     [
      "2026-10-22",
-     115.31,
-     1297.21,
-     1412.52
+     112.27,
+     1286.12,
+     1398.39
     ]
    ]
   },
   "completo": {
    "inicio": "2026-07-05 17:54",
-   "liquido": 148.02920613110697,
+   "liquido": 137.76289220109783,
    "aportado": 2000.0,
-   "pnlAcum": -535.3860330806441,
+   "pnlAcum": -559.6808163863082,
    "pos": {
-    "REP.MC": {
-     "u": 9.0,
-     "pm": 30.1200008392334,
-     "pmax": 30.1200008392334
-    },
     "COP": {
      "u": 1.0,
      "pm": 139.8800048828125,
      "pmax": 146.50999450683594
-    },
-    "BTC-EUR": {
-     "u": 0.004266,
-     "pm": 73152.28125,
-     "pmax": 75339.046875
     },
     "TMO": {
      "u": 0.283217,
@@ -1861,60 +1854,29 @@
     "SAP.DE": {
      "u": 1.0,
      "pm": 199.22000122070312,
-     "pmax": 214.3000030517578
+     "pmax": 215.35000610351562
     },
     "CRM": {
      "u": 0.687975,
      "pm": 240.6999969482422,
-     "pmax": 246.2100067138672
+     "pmax": 250.0449981689453
+    },
+    "SHEL": {
+     "u": 3.0,
+     "pm": 105.73500061035156,
+     "pmax": 105.73500061035156
+    },
+    "LLY": {
+     "u": 0.19167,
+     "pm": 1306.0,
+     "pmax": 1306.0
     }
    },
-   "cooldown": {},
+   "cooldown": {
+    "REP.MC": "2026-10-22",
+    "BTC-EUR": "2026-10-22"
+   },
    "operaciones": [
-    {
-     "t": "2026-07-07",
-     "tk": "GE",
-     "accion": "VENTA",
-     "u": 0.90623,
-     "px": 365.2821044921875,
-     "pnl_pct": -3.24,
-     "motivo": "Trailing stop",
-     "nombre": "GE Aerospace",
-     "alg": "5.0"
-    },
-    {
-     "t": "2026-07-07",
-     "tk": "LLY",
-     "accion": "COMPRA",
-     "u": 0.394081,
-     "px": 1235.7049560546875,
-     "pnl_pct": 0.0,
-     "motivo": "Score 88",
-     "nombre": "Eli Lilly",
-     "alg": "5.0"
-    },
-    {
-     "t": "2026-07-08",
-     "tk": "UCG.MI",
-     "accion": "VENTA",
-     "u": 4.0,
-     "px": 79.37000274658203,
-     "pnl_pct": -3.07,
-     "motivo": "Trailing stop",
-     "nombre": "UniCredit",
-     "alg": "5.0"
-    },
-    {
-     "t": "2026-07-08",
-     "tk": "SAN.MC",
-     "accion": "VENTA",
-     "u": 32.0,
-     "px": 11.814000129699707,
-     "pnl_pct": -4.12,
-     "motivo": "Trailing stop",
-     "nombre": "Santander",
-     "alg": "5.0"
-    },
     {
      "t": "2026-07-08",
      "tk": "ANET",
@@ -3190,6 +3152,50 @@
      "motivo": "Score 85",
      "nombre": "Salesforce",
      "alg": "5.0"
+    },
+    {
+     "t": "2026-10-22",
+     "tk": "REP.MC",
+     "accion": "VENTA",
+     "u": 9.0,
+     "px": 28.260000228881836,
+     "pnl_pct": -6.18,
+     "motivo": "Trailing stop",
+     "nombre": "Repsol",
+     "alg": "5.0"
+    },
+    {
+     "t": "2026-10-22",
+     "tk": "BTC-EUR",
+     "accion": "VENTA",
+     "u": 0.004266,
+     "px": 72319.0,
+     "pnl_pct": -1.14,
+     "motivo": "Trailing stop",
+     "nombre": "Bitcoin",
+     "alg": "5.0"
+    },
+    {
+     "t": "2026-10-22",
+     "tk": "SHEL",
+     "accion": "COMPRA",
+     "u": 3.0,
+     "px": 105.73500061035156,
+     "pnl_pct": 0.0,
+     "motivo": "Score 85",
+     "nombre": "Shell",
+     "alg": "5.0"
+    },
+    {
+     "t": "2026-10-22",
+     "tk": "LLY",
+     "accion": "COMPRA",
+     "u": 0.19167,
+     "px": 1306.0,
+     "pnl_pct": 0.0,
+     "motivo": "Score 83",
+     "nombre": "Eli Lilly",
+     "alg": "5.0"
     }
    ],
    "historico": [
@@ -3657,9 +3663,9 @@
     ],
     [
      "2026-10-22",
-     148.03,
-     1297.63,
-     1445.66
+     137.76,
+     1292.76,
+     1430.52
     ]
    ]
   }
